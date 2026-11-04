@@ -360,7 +360,7 @@ All remaining built-in rules default to `warning`:
 | `version` | `string` | `"LuaLatest"` | Lua version: `Lua5.1`, `LuaJIT`, `Lua5.2`, `Lua5.3`, `Lua5.4`, `Lua5.5`, `LuaLatest` |
 | `requireLikeFunction` | `string[]` | `[]` | Function names treated like require |
 | `frameworkVersions` | `string[]` | `[]` | Framework version identifiers |
-| `extensions` | `string[]` | `[]` | Additional file extensions treated as Lua |
+| `extensions` | `string[]` | `[]` | Additional file extensions treated as Lua (`.lua.txt`, `.c`, see C sources below), or globs of files to include (`**/*.c`) |
 | `requirePattern` | `string[]` | `[]` | Module search patterns such as `?.lua` and `?/init.lua` |
 | `nonstandardSymbol` | `string[]` | `[]` | Allowed non-standard syntax symbols |
 | `special` | `object` | `{}` | Special function mappings |
@@ -388,6 +388,38 @@ Supported `nonstandardSymbol` values:
 - `continue`
 
 Supported `special` values: `none`, `require`, `error`, `assert`, `type`, `setmetatable`.
+
+A C or C++ source included through `extensions` (`.c`, `.h`, `.cc`, `.cpp`, `.cxx`, `.hh`, `.hpp`, `.hxx`) contributes
+the EmmyLua annotations kept in its `/** ... */` comments, written with ` * ` in place of `---`. A comment is read when
+it holds a Lua statement line (`function <name>(<params>) end`, `local <name> = {}` or `return <name>`) that says what
+the annotations above it describe, or when it defines a type with `@class`, `@enum` or `@alias`; other comments stay C
+documentation.
+
+```c
+/**
+ * @class mylib
+ * local mylib = {}
+ */
+
+/**
+ * Greet someone.
+ *
+ * @param name string who to greet
+ * @return string greeting
+ * function mylib.greet(name) end
+ */
+static int mylib_greet(lua_State *L)
+{
+    /* ... */
+}
+
+/**
+ * return mylib
+ */
+```
+
+The source is a module like a Lua file at its path (`require("mylib")` finds `mylib.c`), and diagnostics point at its
+own lines and columns. Start a glob in `extensions` with `**/`: editors receive it as a file-watcher pattern.
 
 ### workspace
 

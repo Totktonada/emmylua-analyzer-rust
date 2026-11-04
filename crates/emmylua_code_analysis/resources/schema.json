@@ -974,7 +974,7 @@
       "type": "object",
       "properties": {
         "extensions": {
-          "description": "file Extensions. eg: .lua, .lua.txt",
+          "description": "File extensions treated as Lua (eg: .lua.txt) or globs of files to include\n(eg: **/*.c; a C source contributes the annotations in its comments)",
           "type": "array",
           "default": [],
           "items": {

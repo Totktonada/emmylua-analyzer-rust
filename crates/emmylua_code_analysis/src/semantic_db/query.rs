@@ -25,6 +25,7 @@ use super::types::{
 };
 use crate::Emmyrc;
 use crate::FileId;
+use crate::vfs::strip_c_extension;
 use emmylua_parser::{
     BinaryOperator, LuaAstNode, LuaCallExpr, LuaClosureExpr, LuaDocType, LuaExpr, LuaIndexExpr,
     LuaLiteralExpr, LuaLiteralToken, LuaReturnStat, LuaSyntaxId, LuaSyntaxTree,
@@ -1549,14 +1550,17 @@ impl WorkspaceIndexCache {
     }
 }
 
-/// File path -> module name: relative to workspace root, strip `.lua`, `init.lua` -> parent dir, `/` -> `.`.
+/// File path -> module name: relative to workspace root, strip `.lua` (or a C source's extension), `init.lua` -> parent dir, `/` -> `.`.
 pub(crate) fn module_name_from_path(path: &Path, root: Option<&Path>) -> Option<SmolStr> {
     let rel = match root {
         Some(root) => path.strip_prefix(root).unwrap_or(path),
         None => path,
     };
     let text = rel.to_string_lossy().replace('\\', "/");
-    let text = text.strip_suffix(".lua").unwrap_or(&text);
+    let text = text
+        .strip_suffix(".lua")
+        .or_else(|| strip_c_extension(&text))
+        .unwrap_or(&text);
     let text = text.strip_suffix("/init").unwrap_or(&text);
     if text.is_empty() {
         return None;

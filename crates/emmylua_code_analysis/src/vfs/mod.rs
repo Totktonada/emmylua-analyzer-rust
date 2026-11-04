@@ -1,3 +1,4 @@
+mod c_source;
 mod collect_workspace_files;
 mod document;
 mod file_id;
@@ -5,6 +6,7 @@ mod file_uri_handler;
 mod loader;
 mod virtual_url;
 
+pub(crate) use c_source::strip_c_extension;
 pub use collect_workspace_files::*;
 pub use document::LuaDocument;
 use emmylua_parser::{LineIndex, LuaParseError, LuaParser, LuaSyntaxTree};
@@ -111,6 +113,10 @@ impl Vfs {
             }
         }
 
+        let text = match &path {
+            Some(path) if c_source::is_c_source(path) => c_source::c_source_to_lua(&text),
+            _ => text,
+        };
         let line_index = Arc::new(LineIndex::parse(&text));
         let tree = self.emmyrc.as_ref().map(|emmyrc| {
             let parse_config = emmyrc.get_parse_config(&mut self.node_cache);

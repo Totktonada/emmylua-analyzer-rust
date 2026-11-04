@@ -19,7 +19,8 @@ pub struct EmmyrcRuntime {
     /// Framework versions.
     pub framework_versions: Vec<String>,
     #[serde(default)]
-    /// file Extensions. eg: .lua, .lua.txt
+    /// File extensions treated as Lua (eg: .lua.txt) or globs of files to include
+    /// (eg: **/*.c; a C source contributes the annotations in its comments)
     pub extensions: Vec<String>,
     #[serde(default)]
     /// Require pattern. eg. "?.lua", "?/init.lua"
