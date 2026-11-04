@@ -49,6 +49,10 @@ pub struct CmdArgs {
     #[cfg_attr(feature = "cli", arg(long, value_enum, ignore_case = true))]
     pub severity: Option<DiagnosticSeverityFilter>,
 
+    /// Run the programs that the configuration names to read files (`workspace.inputFilters`)
+    #[cfg_attr(feature = "cli", arg(long))]
+    pub allow_input_filters: bool,
+
     /// Verbose output
     #[cfg_attr(feature = "cli", arg(long))]
     pub verbose: bool,

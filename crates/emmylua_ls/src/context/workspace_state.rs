@@ -9,6 +9,7 @@ use std::path::PathBuf;
 use emmylua_code_analysis::{Emmyrc, WorkspaceFileMatcher, WorkspaceFolder, uri_to_file_path};
 use lsp_types::Uri;
 
+use super::InputFilterTrust;
 use crate::handlers::ClientConfig;
 
 #[derive(Debug, Clone, Default)]
@@ -25,6 +26,7 @@ pub struct WorkspaceState {
     pub open_file_state_version: u64,
     pub match_file_pattern: WorkspaceFileMatcher,
     pub client_config: ClientConfig,
+    pub input_filter_trust: InputFilterTrust,
 }
 
 impl WorkspaceState {
@@ -36,6 +38,7 @@ impl WorkspaceState {
             open_file_state_version: 0,
             match_file_pattern: WorkspaceFileMatcher::default(),
             client_config,
+            input_filter_trust: InputFilterTrust::default(),
         }
     }
 

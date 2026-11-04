@@ -26,7 +26,7 @@ impl PreProcessContext {
                     None
                 }
             },
-            placeholder_regex: match Regex::new(r"\{([^}]+)\}") {
+            placeholder_regex: match Regex::new(r"\$?\{([^}]+)\}") {
                 Ok(re) => Some(re),
                 Err(_) => {
                     log::error!(
@@ -57,6 +57,15 @@ impl PreProcessContext {
         iter.map(|root| self.pre_process_workspace_path_item(root))
             .filter(|path| seen.insert(path.clone()))
             .collect()
+    }
+
+    /// A program or an argument of an input filter: placeholders are replaced, nothing
+    /// else, since an argument need not be a path. `${file}` is left for the run.
+    pub fn pre_process_command_arg(&self, arg: &str) -> String {
+        match self.workspace.to_str() {
+            Some(workspace) => self.replace_placeholders(arg, workspace),
+            None => arg.to_string(),
+        }
     }
 
     fn pre_process_path(&self, path: &str) -> String {

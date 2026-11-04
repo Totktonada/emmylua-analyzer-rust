@@ -9,6 +9,7 @@ use std::{path::PathBuf, sync::Arc, time::Duration};
 use super::workspace_state::{OpenFilesSnapshot, WorkspaceState};
 use super::{AnalysisState, ClientProxy, DiagnosticService};
 use crate::context::ServerContextSnapshot;
+use crate::context::check_input_filters;
 use crate::context::lsp_features::LspFeatures;
 use crate::handlers::{ClientConfig, init_analysis, register_files_watch};
 use emmylua_code_analysis::{
@@ -363,6 +364,7 @@ async fn apply_workspace_reload(
     workspace_folders: Vec<WorkspaceFolder>,
     emmyrc: Arc<Emmyrc>,
 ) {
+    let emmyrc = check_input_filters(&context, emmyrc).await;
     let open_files = {
         let mut workspace_manager = context.workspace_manager().lock().await;
         workspace_manager.update_match_state(emmyrc.as_ref());

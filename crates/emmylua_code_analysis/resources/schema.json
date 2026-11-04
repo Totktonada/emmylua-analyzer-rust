@@ -149,6 +149,7 @@
         "encoding": "utf-8",
         "ignoreDir": [],
         "ignoreGlobs": [],
+        "inputFilters": [],
         "library": [],
         "moduleMap": [],
         "packages": [],
@@ -831,6 +832,39 @@
         }
       }
     },
+    "EmmyrcInputFilter": {
+      "description": "A program that gets a file's text on its standard input and prints the Lua text to\nanalyze in its place. Keeping the file's lines keeps diagnostics at the file's own positions.",
+      "type": "object",
+      "properties": {
+        "args": {
+          "description": "The arguments; `${file}` is replaced with the file's path. eg: [\"${workspaceFolder}/tools/c2lua.lua\", \"${file}\"]",
+          "type": "array",
+          "default": [],
+          "items": {
+            "type": "string"
+          }
+        },
+        "glob": {
+          "description": "Glob of the files to read through the program; they join the workspace. eg: \"**/*.c\"",
+          "type": "string"
+        },
+        "program": {
+          "description": "The program to run.",
+          "type": "string"
+        },
+        "timeout": {
+          "description": "Timeout in milliseconds, after which the file is read as empty.",
+          "type": "integer",
+          "format": "uint64",
+          "default": 5000,
+          "minimum": 0
+        }
+      },
+      "required": [
+        "glob",
+        "program"
+      ]
+    },
     "EmmyrcLuaVersion": {
       "oneOf": [
         {
@@ -1123,6 +1157,14 @@
           "default": [],
           "items": {
             "type": "string"
+          }
+        },
+        "inputFilters": {
+          "description": "Programs that turn files of other languages into the Lua text the analyzer reads,\neg: the annotations in the comments of a C source. They run only once allowed: the\nlanguage server asks the user, emmylua_check and emmylua_doc_cli take `--allow-input-filters`.",
+          "type": "array",
+          "default": [],
+          "items": {
+            "$ref": "#/$defs/EmmyrcInputFilter"
           }
         },
         "library": {

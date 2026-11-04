@@ -7,7 +7,7 @@ use crate::{
     cmd_args::CmdArgs,
     context::{
         AnalysisState, DiagnosticService, LspFeatures, ProgressTask, ServerContextSnapshot,
-        StatusBar, get_client_id, load_emmy_config,
+        StatusBar, check_input_filters, get_client_id, load_emmy_config,
     },
     handlers::text_document::register_files_watch,
     logger::init_logger,
@@ -66,6 +66,7 @@ pub async fn initialized_handler(
     let config_root: Option<PathBuf> = main_root.map(PathBuf::from);
 
     let emmyrc = load_emmy_config(config_root, client_config.clone());
+    let emmyrc = check_input_filters(&context, emmyrc).await;
 
     // init std lib
     init_std_lib(context.analysis(), &cmd_args, emmyrc.clone()).await;

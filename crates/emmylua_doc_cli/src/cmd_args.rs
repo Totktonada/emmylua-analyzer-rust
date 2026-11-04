@@ -52,6 +52,10 @@ pub struct CmdArgs {
     #[arg(long)]
     pub mixin: Option<PathBuf>,
 
+    /// Run the programs that the configuration names to read files (`workspace.inputFilters`)
+    #[arg(long)]
+    pub allow_input_filters: bool,
+
     /// Verbose output
     #[arg(long)]
     pub verbose: bool,

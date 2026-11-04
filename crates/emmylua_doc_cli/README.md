@@ -117,6 +117,7 @@ Options:
       --override-template <OVERRIDE_TEMPLATE>  The path of the override template
       --site-name <SITE_NAME>                  [default: Docs]
       --mixin <MIXIN>                          The path of the mixin md file
+      --allow-input-filters                    Run the programs that the configuration names to read files (`workspace.inputFilters`)
       --verbose                                Verbose output
   -h, --help                                   Print help
   -V, --version                                Print version

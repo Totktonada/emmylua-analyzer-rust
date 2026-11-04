@@ -44,6 +44,7 @@ pub fn generate_fixture(fixture_name: &str, source: &str) -> PathBuf {
         site_name: None,
         mixin: None,
         verbose: false,
+        allow_input_filters: false,
     };
     run_doc_cli(args).expect("run_doc_cli failed");
 

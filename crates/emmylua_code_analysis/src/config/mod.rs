@@ -11,9 +11,9 @@ pub use configs::{
     DiagnosticSeveritySetting, DocSyntax, EmmyLibraryConfig, EmmyLibraryItem, EmmyrcCodeAction,
     EmmyrcCodeLens, EmmyrcCompletion, EmmyrcDiagnostic, EmmyrcDoc, EmmyrcDocumentColor,
     EmmyrcExternalTool, EmmyrcFilenameConvention, EmmyrcHover, EmmyrcInlayHint, EmmyrcInlineValues,
-    EmmyrcLuaVersion, EmmyrcReference, EmmyrcReformat, EmmyrcResource, EmmyrcRuntime,
-    EmmyrcSemanticToken, EmmyrcSignature, EmmyrcStrict, EmmyrcWorkspace, EmmyrcWorkspaceModuleMap,
-    EmmyrcWorkspacePathConfig, EmmyrcWorkspacePathItem,
+    EmmyrcInputFilter, EmmyrcLuaVersion, EmmyrcReference, EmmyrcReformat, EmmyrcResource,
+    EmmyrcRuntime, EmmyrcSemanticToken, EmmyrcSignature, EmmyrcStrict, EmmyrcWorkspace,
+    EmmyrcWorkspaceModuleMap, EmmyrcWorkspacePathConfig, EmmyrcWorkspacePathItem,
 };
 use emmylua_parser::{LuaFeaturesSet, LuaLanguageLevel, ParserConfig, SpecialFunction};
 use rowan::NodeCache;
@@ -160,5 +160,12 @@ impl Emmyrc {
             context.process_and_dedup_string(self.workspace.ignore_dir.iter());
 
         self.resource.paths = context.process_and_dedup_string(self.resource.paths.iter());
+
+        for filter in &mut self.workspace.input_filters {
+            filter.program = context.pre_process_command_arg(&filter.program);
+            for arg in &mut filter.args {
+                *arg = context.pre_process_command_arg(arg);
+            }
+        }
     }
 }

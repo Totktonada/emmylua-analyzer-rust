@@ -64,6 +64,7 @@ pub async fn load_workspace(
     cmd_workspace_folders: Vec<PathBuf>,
     config_paths: Option<Vec<PathBuf>>,
     ignore: Option<Vec<String>>,
+    allow_input_filters: bool,
 ) -> Option<EmmyLuaAnalysis> {
     let main_path = normalize_local_path(main_path);
     let cmd_workspace_folders = cmd_workspace_folders
@@ -96,6 +97,12 @@ pub async fn load_workspace(
         config_root.display()
     );
     emmyrc.pre_process_emmyrc(&config_root);
+    if !allow_input_filters && !emmyrc.workspace.input_filters.is_empty() {
+        log::warn!(
+            "Not running the input filters of the configuration, so their files are not loaded: pass --allow-input-filters to run them"
+        );
+        emmyrc.workspace.input_filters.clear();
+    }
 
     let workspace_folders = cmd_workspace_folders
         .iter()

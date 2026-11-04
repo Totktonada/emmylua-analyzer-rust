@@ -2,6 +2,7 @@ mod collect_workspace_files;
 mod document;
 mod file_id;
 mod file_uri_handler;
+mod input_filter;
 mod loader;
 mod virtual_url;
 
@@ -11,6 +12,7 @@ use emmylua_parser::{LineIndex, LuaParseError, LuaParser, LuaSyntaxTree};
 pub use file_id::{FileId, InFiled};
 pub use file_uri_handler::{file_path_to_uri, uri_to_file_path};
 use hashbrown::{HashMap, HashSet};
+use input_filter::InputFilters;
 pub use loader::{LuaFileInfo, load_workspace_files, read_file_with_encoding};
 use lsp_types::Uri;
 use rowan::NodeCache;
@@ -28,6 +30,7 @@ pub struct Vfs {
     uri_map: HashMap<Uri, FileId>,
     path_map: HashMap<PathBuf, FileId>,
     emmyrc: Option<Arc<Emmyrc>>,
+    input_filters: InputFilters,
     node_cache: NodeCache,
 }
 
@@ -46,6 +49,7 @@ impl Vfs {
             uri_map: HashMap::new(),
             path_map: HashMap::new(),
             emmyrc: None,
+            input_filters: InputFilters::default(),
             node_cache: NodeCache::default(),
         }
     }
@@ -111,6 +115,10 @@ impl Vfs {
             }
         }
 
+        let text = match &path {
+            Some(path) => self.input_filters.apply(path, text),
+            None => text,
+        };
         let line_index = Arc::new(LineIndex::parse(&text));
         let tree = self.emmyrc.as_ref().map(|emmyrc| {
             let parse_config = emmyrc.get_parse_config(&mut self.node_cache);
@@ -216,6 +224,7 @@ impl Vfs {
     }
 
     pub fn update_config(&mut self, emmyrc: Arc<Emmyrc>) {
+        self.input_filters = InputFilters::new(&emmyrc.workspace.input_filters);
         self.emmyrc = Some(emmyrc);
     }
 
@@ -250,6 +259,7 @@ impl Vfs {
         self.uri_map.clear();
         self.path_map.clear();
         self.emmyrc = None;
+        self.input_filters = InputFilters::default();
         self.node_cache = NodeCache::default();
     }
 }

@@ -160,6 +160,7 @@ Options:
       --output <OUTPUT>                Specify output target (stdout or file path, only used when output_format is json) [default: stdout]
       --warnings-as-errors             Treat warnings as errors
       --severity <SEVERITY>            Only output diagnostics at this severity or above [possible values: error, warn, info, hint]
+      --allow-input-filters            Run the programs that the configuration names to read files (`workspace.inputFilters`)
       --verbose                        Verbose output
   -h, --help                           Print help information
   -V, --version                        Print version information

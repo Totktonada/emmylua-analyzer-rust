@@ -403,6 +403,7 @@ Supported `special` values: `none`, `require`, `error`, `assert`, `type`, `setme
 | `moduleMap` | `object[]` | `[]` | Module name rewrite rules |
 | `reindexDuration` | `number` | `5000` | Delay before full reindex, in milliseconds |
 | `enableReindex` | `boolean` | `false` | Enable full reindex after file changes |
+| `inputFilters` | `object[]` | `[]` | Programs that turn files of other languages into Lua to analyze, see below |
 
 `library` and `packages` can be either a string path or an object:
 
@@ -435,6 +436,42 @@ Supported `special` values: `none`, `require`, `error`, `assert`, `type`, `setme
   }
 }
 ```
+
+`inputFilters` lets a project keep annotations in files of another language, such as the comments of the C source
+that implements a Lua API, and read them with a program of its own:
+
+```json
+{
+  "workspace": {
+    "inputFilters": [
+      {
+        "glob": "**/*.c",
+        "program": "lua",
+        "args": ["${workspaceFolder}/tools/c2lua.lua", "${file}"],
+        "timeout": 5000
+      }
+    ],
+    "moduleMap": [
+      {
+        "pattern": "^(.*)\\.c$",
+        "replace": "$1"
+      }
+    ]
+  }
+}
+```
+
+The files that `glob` matches join the workspace (start the glob with `**/`: editors receive it as a file-watcher
+pattern), and each is read through `program`. It gets the file's text on its standard input, the file's path in place
+of `${file}` in `args`, and what it prints is analyzed in place of the file. A program that keeps the file's lines,
+leaving the lines it drops empty, keeps diagnostics, definitions and hovers at the file's own lines. A file whose program
+fails or runs out of `timeout` milliseconds is analyzed as empty. With the `moduleMap` entry above, `require("mylib")`
+finds `mylib.c`, as it finds `mylib.lua`.
+
+A configuration comes with a workspace, so its programs run only once allowed. The language server asks the user, once
+for each set of filters, and waits for the answer before it loads the workspace, with them or without. It keeps the sets
+allowed in `emmylua_ls/allowed_input_filters.json` under the user's local data directory (`~/.local/share` on Linux);
+`emmylua_check` and `emmylua_doc_cli` run them with `--allow-input-filters`.
 
 When multiple `workspaceRoots` contain the same module path, a lookup prefers
 matches in the calling file's most specific configured root. Root-relative

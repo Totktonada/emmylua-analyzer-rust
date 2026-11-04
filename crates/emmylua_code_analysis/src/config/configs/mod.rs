@@ -33,6 +33,6 @@ pub use semantictoken::EmmyrcSemanticToken;
 pub use signature::EmmyrcSignature;
 pub use strict::EmmyrcStrict;
 pub use workspace::{
-    EmmyLibraryConfig, EmmyLibraryItem, EmmyrcWorkspace, EmmyrcWorkspaceModuleMap,
-    EmmyrcWorkspacePathConfig, EmmyrcWorkspacePathItem,
+    EmmyLibraryConfig, EmmyLibraryItem, EmmyrcInputFilter, EmmyrcWorkspace,
+    EmmyrcWorkspaceModuleMap, EmmyrcWorkspacePathConfig, EmmyrcWorkspacePathItem,
 };

@@ -157,6 +157,10 @@ pub fn calculate_include_and_exclude(emmyrc: &Emmyrc) -> (Vec<String>, Vec<Strin
         }
     }
 
+    for filter in &emmyrc.workspace.input_filters {
+        include.push(filter.glob.clone());
+    }
+
     for ignore_glob in &emmyrc.workspace.ignore_globs {
         exclude.push(ignore_glob.clone());
     }

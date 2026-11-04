@@ -43,6 +43,11 @@ pub struct EmmyrcWorkspace {
     #[serde(default = "enable_reindex_default")]
     #[schemars(extend("x-vscode-setting" = true))]
     pub enable_reindex: bool,
+    /// Programs that turn files of other languages into the Lua text the analyzer reads,
+    /// eg: the annotations in the comments of a C source. They run only once allowed: the
+    /// language server asks the user, emmylua_check and emmylua_doc_cli take `--allow-input-filters`.
+    #[serde(default)]
+    pub input_filters: Vec<EmmyrcInputFilter>,
 }
 
 impl Default for EmmyrcWorkspace {
@@ -58,6 +63,7 @@ impl Default for EmmyrcWorkspace {
             module_map: Vec::new(),
             reindex_duration: 5000,
             enable_reindex: false,
+            input_filters: Vec::new(),
         }
     }
 }
@@ -66,6 +72,23 @@ impl Default for EmmyrcWorkspace {
 pub struct EmmyrcWorkspaceModuleMap {
     pub pattern: String,
     pub replace: String,
+}
+
+/// A program that gets a file's text on its standard input and prints the Lua text to
+/// analyze in its place. Keeping the file's lines keeps diagnostics at the file's own positions.
+#[derive(Serialize, Deserialize, Debug, JsonSchema, Clone, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+pub struct EmmyrcInputFilter {
+    /// Glob of the files to read through the program; they join the workspace. eg: "**/*.c"
+    pub glob: String,
+    /// The program to run.
+    pub program: String,
+    /// The arguments; `${file}` is replaced with the file's path. eg: ["${workspaceFolder}/tools/c2lua.lua", "${file}"]
+    #[serde(default)]
+    pub args: Vec<String>,
+    /// Timeout in milliseconds, after which the file is read as empty.
+    #[serde(default = "input_filter_timeout_default")]
+    pub timeout: u64,
 }
 
 #[derive(Serialize, Deserialize, Debug, JsonSchema, Clone, Hash, PartialEq, Eq)]
@@ -115,4 +138,8 @@ fn reindex_duration_default() -> u64 {
 
 fn enable_reindex_default() -> bool {
     false
+}
+
+fn input_filter_timeout_default() -> u64 {
+    5000
 }

@@ -38,6 +38,7 @@ pub fn run_doc_cli(mut cmd_args: CmdArgs) -> Result<(), Box<dyn std::error::Erro
         cmd_args.config,
         cmd_args.exclude_pattern,
         cmd_args.include_pattern,
+        cmd_args.allow_input_filters,
     ) {
         Some(analysis) => analysis,
         None => {
